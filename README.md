@@ -4,6 +4,7 @@
 <h3> Epochs = 300 </h3>
 <h3> Clients = 5 </h3>
 Optimizers: DFW, PerturbedGradientDescent (specifically for FedProx)
+PGD performed better (FedProx), then DFW with FedProx and DFW FedAvg are almost same!!
 <h4> ACCURACY</h4>
 
 | Optimizer | 2 | 4 | 6 | 8 | 16 |
