@@ -8,8 +8,8 @@ Optimizers: DFW, PerturbedGradientDescent (specifically for FedProx)
 PGD performed better (FedProx), then DFW with FedProx and DFW FedAvg are almost same!!
 <h4> ACCURACY</h4>
 
-| Optimizer | 2 | 4 | 6 | 8 | 16 |
-| --- | --- | --- | --- | --- | --- |
+| Optimizer | 2 | 4 | 6 | 8 | 16 | --- |
+| --- | --- | --- | --- | --- | --- | --- |
 | SGD | 70.0573 | 70.7439 | 69.4774 | 69.5041 | 67.1977 | FedAvg |
 | BCDFW | 71.8571 | 66.2378 | 64.6114 | 61.2518 | 54.4661 | FedAvg |
 | DFW | 80.0069 | 78.6828 | 78.1630 | 77.9363 | 77.5963 |  FedProx |
@@ -18,8 +18,8 @@ PGD performed better (FedProx), then DFW with FedProx and DFW FedAvg are almost 
 
 <h4> LOSS</h4>
 
-| Optimizer | 2 | 4 | 6 | 8 | 16 |
-| --- | --- | --- | --- | --- | --- |
+| Optimizer | 2 | 4 | 6 | 8 | 16 | --- |
+| --- | --- | --- | --- | --- | --- | --- |
 | SGD | 0.4813 | 0.6934 | 0.9535 | 0.6434 | 0.8552 | FedAvg  |
 | BCDFW | 0.9481 | 0.9484 | 0.9879 | 1.0980 | 1.2994 | FedAvg  |
 | DFW | 0.0945 | 0.1713 | 0.1977 | 0.2131 | 0.2879 | FedAvg  |
