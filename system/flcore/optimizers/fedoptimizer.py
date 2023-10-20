@@ -154,8 +154,84 @@ class PerturbedGradientDescent(Optimizer):
 
 
 
+# class DFW(optim.Optimizer):
+#     def __init__(self, params, model,lr=required, momentum=0, weight_decay=0, eps=1e-5, mu=0.0):
+#         if lr is not required and lr <= 0.0:
+#             raise ValueError("Invalid eta: {}".format(lr))
+#         if momentum < 0.0:
+#             raise ValueError("Invalid momentum value: {}".format(momentum))
+#         if weight_decay < 0.0:
+#             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
+
+#         defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay, mu=mu)
+#         super(DFW, self).__init__(params, defaults)
+#         self.eps = eps
+#         self.model = model
+
+#         for group in self.param_groups:
+#             if group['mu']:
+#                 for p in group['params']:
+#                     self.state[p]['momentum_buffer'] = torch.zeros_like(p.data, requires_grad=False)
+                    
+#     @torch.autograd.no_grad()
+#     def step(self, closure=None):
+#         loss = float(closure())
+
+#         w_dict = defaultdict(dict)
+#         for group in self.param_groups:
+#             wd = group['weight_decay']
+#             for param in group['params']:
+#                 if param.grad is None:
+#                     continue
+#                 w_dict[param]['delta_t'] = param.grad.data
+#                 w_dict[param]['r_t'] = wd * param.data
+
+#         self._line_search(loss, w_dict)
+
+#         for group in self.param_groups:
+#             lr = group['lr']
+#             mu = group['mu']
+#             for param in group['params']:
+#                 if param.grad is None:
+#                     continue
+#                 state = self.state[param]
+#                 delta_t, r_t = w_dict[param]['delta_t'], w_dict[param]['r_t']
+
+#                 param.data -= lr * (r_t + self.gamma * delta_t)
+
+#                 if mu:
+#                     z_t = state['momentum_buffer']
+#                     z_t *= mu
+#                     z_t -= lr * self.gamma * (delta_t + r_t)
+#                     param.data += mu * z_t
+
+#                 # Additional Proximal Term
+#                 if mu:
+#                     d_p = param.grad.data + mu * (param.data - self.model.state_dict()[param_name])  
+#                     # Use self.model as the reference
+#                     param.data.add_(d_p, alpha=-lr)
+
+#     @torch.autograd.no_grad()
+#     def _line_search(self, loss, w_dict):
+#         """
+#         Computes the line search in closed form.
+#         """
+#         num = loss
+#         denom = 0
+
+#         for group in self.param_groups:
+#             lr = group['lr']
+#             for param in group['params']:
+#                 if param.grad is None:
+#                     continue
+#                 delta_t, r_t = w_dict[param]['delta_t'], w_dict[param]['r_t']
+#                 num -= lr * torch.sum(delta_t * r_t)
+#                 denom += lr * delta_t.norm() ** 2
+
+#         self.gamma = float((num / (denom + self.eps)).clamp(min=0, max=1))
+
 class DFW(optim.Optimizer):
-    def __init__(self, params, model, lr=required, momentum=0, weight_decay=0, eps=1e-5, mu=0.0):
+    def __init__(self, params, global_params, lr=required, momentum=0, weight_decay=0, eps=1e-5, mu=0.0):
         if lr is not required and lr <= 0.0:
             raise ValueError("Invalid eta: {}".format(lr))
         if momentum < 0.0:
@@ -163,16 +239,16 @@ class DFW(optim.Optimizer):
         if weight_decay < 0.0:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
 
-        self.model = model
-        defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay, mu=mu)
+        self.global_params = global_params  # Include global parameters
+        defaults = dict(lr=lr, momentum=momentum, weight_decay=weight_decay, eps=eps, mu=mu)
         super(DFW, self).__init__(params, defaults)
         self.eps = eps
 
         for group in self.param_groups:
-            if group['mu']:
+            if group['momentum']:
                 for p in group['params']:
                     self.state[p]['momentum_buffer'] = torch.zeros_like(p.data, requires_grad=False)
-                    
+
     @torch.autograd.no_grad()
     def step(self, closure=None):
         loss = float(closure())
@@ -204,10 +280,10 @@ class DFW(optim.Optimizer):
                     z_t *= mu
                     z_t -= lr * self.gamma * (delta_t + r_t)
                     param.data += mu * z_t
-                # Additional Proximal Term
+
+                # Additional Proximal Term with global_params
                 if mu:
-                    d_p = param.grad.data + mu * (param.data - model.state_dict()[param_name])  
-                    # Use self.model as the reference
+                    d_p = param.grad.data + mu * (param.data - self.global_params)  # Use global_params
                     param.data.add_(d_p, alpha=-lr)
 
     @torch.autograd.no_grad()
@@ -227,4 +303,5 @@ class DFW(optim.Optimizer):
                 num -= lr * torch.sum(delta_t * r_t)
                 denom += lr * delta_t.norm() ** 2
 
-        self.gamma = float((num / (denom + self.eps)).clamp(min=0, max=1))
+        self.gamma = float((num / (denom + self.defaults['eps'])).clamp(min=0, max=1))
+

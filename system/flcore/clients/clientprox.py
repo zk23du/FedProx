@@ -30,7 +30,7 @@ class clientProx(Client):
         #self.loss = nn.MultiMarginLoss()
 
         # Define the optimizer using your modified DFW optimizer
-        self.optimizer = DFW(self.model.parameters(),model=self.model, lr=0.9, momentum=0.9, mu = self.mu)
+        self.optimizer = DFW(self.model.parameters(),self.global_params, lr=0.9, momentum=0, mu = self.mu)
 
         self.learning_rate_scheduler = torch.optim.lr_scheduler.ExponentialLR(
             optimizer=self.optimizer, 
