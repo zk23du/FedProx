@@ -1,7 +1,7 @@
 ### Flow
 ## system --> flcore --> optimizers
-                                    --> fedoptimizer.py (DFW code)
-                                    --> dfw.py (DFW_Prox code)
+                                    --> fedoptimizer.py (DFW_Prox code)
+                                    --> dfw.py (DFW code)
                                     --> dfw_testing.py (another way of writing DFW_Prox)
 
 <h2> TEXT </h2>
