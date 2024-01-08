@@ -9,6 +9,7 @@
 <h3> Epochs = 100 </h3>
 <h3> Clients = 5 </h3>
 
+(Table to be updated..a few entries)
 <h4> ACCURACY</h4>
 
 | Optimizer | 2 | 4 | 6 | 8 | 16 | Model | |
